@@ -22,10 +22,17 @@
 	"peerDependencies": {
 		"knex": "^2.3.0",
 		"mongodb": "^4.12.1",
+		"redis": "^4.5.1",
 		"telegraf": "^4.11.2"
 	},
 	"peerDependenciesMeta": {
+		"knex": {
+			"optional": true
+		},
 		"mongodb": {
+			"optional": true
+		},
+		"redis": {
 			"optional": true
 		}
 	},

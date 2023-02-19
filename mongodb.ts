@@ -8,8 +8,8 @@ interface NewClientOpts {
 	mongo?: MongoClientOptions;
 	/** MongoDB collection name to use for sessions. Defaults to "telegraf-sessions". */
 	collection?: string;
-	/** Called on Mongo::connect errors */
-	onConnectError?: (err: unknown) => void;
+	/** Called on fatal connection or setup errors */
+	onInitError?: (err: unknown) => void;
 }
 
 interface ExistingClientOpts {
@@ -34,7 +34,7 @@ export const Mongo = <Session>(opts: Opts): SessionStore<Session> => {
 	else {
 		client = new MongoClient(opts.url, opts.mongo);
 		connection = client.connect();
-		connection.catch(opts.onConnectError);
+		connection.catch(opts.onInitError);
 	}
 
 	const collection = client.db().collection<SessionDoc>(opts.collection || "telegraf-sessions");

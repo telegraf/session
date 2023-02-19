@@ -4,6 +4,7 @@
 		"module": "commonjs",
 		"strict": true,
 		"skipLibCheck": true,
+		"skipDefaultLibCheck": true,
 		"declaration": true,
 		"forceConsistentCasingInFileNames": true,
 		"rootDir": "."
