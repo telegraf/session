@@ -1,5 +1,15 @@
-import { Knex, knex } from "knex";
-import { SessionStore } from "./types";
+import { Kysely } from "kysely";
+import type { KyselyConfig } from "kysely";
+import type { SessionStore } from "./types";
+
+interface SessionTable {
+	key: string;
+	session: string;
+}
+
+interface Database {
+	"telegraf-sessions": SessionTable;
+}
 
 interface NewClientOpts {
 	/**
@@ -9,7 +19,7 @@ interface NewClientOpts {
 	 *
 	 * @see {@link https://knexjs.org/guide/#configuration-options Knex | Configuration Options}
 	 * */
-	config: Knex.Config;
+	config: KyselyConfig;
 	/** Table name to use for sessions. Defaults to "telegraf-sessions". */
 	table?: string;
 	/** Called on fatal connection or setup errors */
@@ -18,7 +28,7 @@ interface NewClientOpts {
 
 interface ExistingClientOpts {
 	/** If passed, we'll reuse this client instead of creating our own. */
-	connection: Knex;
+	client: Kysely<Database>;
 	/** Table name to use for sessions. Defaults to "telegraf-sessions". */
 	table?: string;
 }
@@ -27,38 +37,50 @@ export type Opts = NewClientOpts | ExistingClientOpts;
 
 /** @unstable */
 export const SQL = <Session>(opts: Opts): SessionStore<Session> => {
-	interface SessionTable {
-		key: string;
-		session: Session;
-	}
+	// this assertion is a hack to make the Database type work
+	const table = (opts.table || "telegraf-sessions") as "telegraf-sessions";
 
-	const table = opts.table || "telegraf-sessions";
+	let client: Kysely<Database>;
+	if ("client" in opts) client = opts.client;
+	else client = new Kysely(opts.config);
 
-	let client: Knex;
-	if ("connection" in opts) client = opts.connection;
-	else client = knex(opts.config);
-
-	const create = client.schema.createTableIfNotExists(table, function (table) {
-		table.string("key", 32);
-		table.json("session");
-	});
+	const create = client.schema
+		.createTable(table)
+		.ifNotExists()
+		.addColumn("key", "varchar(32)", col => col.notNull())
+		.addColumn("session", "text")
+		.execute();
 
 	if ("onInitError" in opts) create.catch(opts.onInitError);
-
-	const q = client<SessionTable>(table);
 
 	return {
 		async get(key) {
 			await create;
-			return (await q.select("session").where({ key }).limit(1)).at(0)?.session;
+
+			const value = (
+				await client
+					//
+					.selectFrom(table)
+					.select("session")
+					.where("key", "=", key)
+					.executeTakeFirst()
+			)?.session;
+
+			return value ? JSON.parse(value) : undefined;
 		},
 		async set(key: string, session: Session) {
 			await create;
-			return await q.update({ session }).where({ key });
+
+			await client
+				.updateTable(table)
+				.set({ session: JSON.stringify(session) })
+				.where("key", "=", key)
+				.executeTakeFirst();
 		},
 		async delete(key: string) {
 			await create;
-			return await q.delete().where({ key });
+
+			await client.deleteFrom(table).where("key", "=", key);
 		},
 	};
 };

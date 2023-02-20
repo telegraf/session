@@ -46,17 +46,18 @@ const store = Mongo({ url: "mongodb://localhost:27017" });
 
 const bot = new Telegraf(token, opts);
 bot.use(session({ store }));
+
 // the rest of your bot
 ```
 
-## SQL (via Knex)
+## SQL (via Kysely)
 
-This adapter works for: PostgreSQL, CockroachDB, MSSQL, MySQL, MariaDB, SQLite3, Better-SQLite3, Oracle, Amazon Redshift, and other compatible databases.
+This adapter works for: PostgreSQL, MySQL, MariaDB, SQLite3 and other compatible databases.
 
 ```shell
-# install knex and a compatible database driver
-# all options: https://knexjs.org/guide/#node-js
-npm i @telegraf/session knex mysql
+# install kysely and a compatible database driver
+# all options: https://koskimas.github.io/kysely
+npm i @telegraf/session kysely mysql2
 ```
 
 ```TS
@@ -78,6 +79,7 @@ const store = SQL({
 
 const bot = new Telegraf(token, opts);
 bot.use(session({ store }));
+
 // the rest of your bot
 ```
 

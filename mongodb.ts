@@ -47,12 +47,7 @@ export const Mongo = <Session>(opts: Opts): SessionStore<Session> => {
 		},
 		async set(key: string, session: Session) {
 			await connection;
-			await collection.updateOne(
-				{ key },
-				// @ts-expect-error session as a geeneric doesn't work for some reason
-				{ $set: { key, session } },
-				{ upsert: true },
-			);
+			await collection.updateOne({ key }, { $set: { key, session } }, { upsert: true });
 		},
 		async delete(key: string) {
 			await connection;
