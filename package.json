@@ -31,13 +31,28 @@
 		"redis": "^4.6.4"
 	},
 	"peerDependenciesMeta": {
+		"@types/better-sqlite3": {
+			"optional": true
+		},
+		"@types/pg": {
+			"optional": true
+		},
+		"better-sqlite3": {
+			"optional": true
+		},
 		"kysely": {
 			"optional": true
 		},
-		"redis": {
+		"mongodb": {
 			"optional": true
 		},
-		"mongodb": {
+		"mysql2": {
+			"optional": true
+		},
+		"pg": {
+			"optional": true
+		},
+		"redis": {
 			"optional": true
 		}
 	},
