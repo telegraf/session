@@ -2,9 +2,10 @@
 	"name": "@telegraf/session",
 	"version": "2.0.0-alpha.1",
 	"description": "Session adapters for Telegraf",
-	"main": "dist/index.js",
+	"main": "./memory.js",
 	"scripts": {
-		"prepare": "rimraf dist && tsc"
+		"clean": "rimraf ./*.js ./*.d.ts",
+		"prepare": "rimraf ./*.js ./*.d.ts && tsc"
 	},
 	"keywords": [
 		"telegraf",
@@ -20,24 +21,34 @@
 		"./*.d.ts"
 	],
 	"peerDependencies": {
+		"@types/better-sqlite3": "^7.6.3",
+		"@types/pg": "^8.6.6",
+		"better-sqlite3": "^8.1.0",
 		"kysely": "^0.23.4",
 		"mongodb": "^5.0.1",
+		"mysql2": "^3.1.2",
+		"pg": "^8.9.0",
 		"redis": "^4.6.4"
 	},
 	"peerDependenciesMeta": {
 		"kysely": {
 			"optional": true
 		},
-		"mongodb": {
+		"redis": {
 			"optional": true
 		},
-		"redis": {
+		"mongodb": {
 			"optional": true
 		}
 	},
 	"devDependencies": {
+		"@types/better-sqlite3": "^7.6.3",
+		"@types/pg": "^8.6.6",
+		"better-sqlite3": "^8.1.0",
 		"kysely": "^0.23.4",
 		"mongodb": "^5.0.1",
+		"mysql2": "^3.1.2",
+		"pg": "^8.9.0",
 		"redis": "^4.6.4",
 		"rimraf": "^3.0.2",
 		"typescript": "^4.8.4"

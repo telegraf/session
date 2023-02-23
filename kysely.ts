@@ -1,6 +1,7 @@
 import { Kysely } from "kysely";
 import type { KyselyConfig } from "kysely";
 import type { SessionStore } from "./types";
+import { defaults } from "./defaults";
 
 interface SessionTable {
 	key: string;
@@ -31,14 +32,16 @@ interface ExistingClientOpts {
 	client: Kysely<Database>;
 	/** Table name to use for sessions. Defaults to "telegraf-sessions". */
 	table?: string;
+	/** Called on fatal connection or setup errors */
+	onInitError?: (err: unknown) => void;
 }
 
 export type Opts = NewClientOpts | ExistingClientOpts;
 
 /** @unstable */
-export const SQL = <Session>(opts: Opts): SessionStore<Session> => {
+export const KyselyStore = <Session>(opts: Opts): SessionStore<Session> => {
 	// this assertion is a hack to make the Database type work
-	const table = (opts.table || "telegraf-sessions") as "telegraf-sessions";
+	const table = (opts.table ?? defaults.table) as "telegraf-sessions";
 
 	let client: Kysely<Database>;
 	if ("client" in opts) client = opts.client;

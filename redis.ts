@@ -21,6 +21,7 @@ interface ExistingClientOpts {
 
 export type Opts = NewClientOpts | ExistingClientOpts;
 
+/** @unstable */
 export const Redis = <Session>(opts: Opts): SessionStore<Session> => {
 	let client: Client;
 	if ("client" in opts) client = opts.client;

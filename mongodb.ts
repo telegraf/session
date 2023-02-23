@@ -1,11 +1,18 @@
 import { MongoClient, MongoClientOptions } from "mongodb";
+import { defaults } from "./defaults";
 import { SessionStore } from "./types";
 
 interface NewClientOpts {
 	/** MongoDB connection URL; required. */
 	url: string;
-	/** Optional MongoClientOptions. */
-	mongo?: MongoClientOptions;
+	/**
+	 * MongoDB MongoClientOptions.
+	 *
+	 * Remember to install the db driver `'mongodb'`.
+	 *
+	 * @see {@link https://www.mongodb.com/docs/drivers/node/current/fundamentals/connection/connection-options MongoDB | Connection Options}
+	 * */
+	config?: MongoClientOptions;
 	/** MongoDB collection name to use for sessions. Defaults to "telegraf-sessions". */
 	collection?: string;
 	/** Called on fatal connection or setup errors */
@@ -17,10 +24,13 @@ interface ExistingClientOpts {
 	client: MongoClient;
 	/** MongoDB collection name to use for sessions. Defaults to "telegraf-sessions". */
 	collection?: string;
+	/** Called on fatal connection or setup errors */
+	onInitError?: (err: unknown) => void;
 }
 
 export type Opts = NewClientOpts | ExistingClientOpts;
 
+/** @unstable */
 export const Mongo = <Session>(opts: Opts): SessionStore<Session> => {
 	interface SessionDoc {
 		key: string;
@@ -32,12 +42,12 @@ export const Mongo = <Session>(opts: Opts): SessionStore<Session> => {
 
 	if ("client" in opts) client = opts.client;
 	else {
-		client = new MongoClient(opts.url, opts.mongo);
+		client = new MongoClient(opts.url, opts.config);
 		connection = client.connect();
 		connection.catch(opts.onInitError);
 	}
 
-	const collection = client.db().collection<SessionDoc>(opts.collection || "telegraf-sessions");
+	const collection = client.db().collection<SessionDoc>(opts.collection ?? defaults.table);
 
 	return {
 		async get(key) {
