@@ -3,7 +3,7 @@
 Install the 'pg' PostgreSQL driver and types alongside this module.
 
 ```shell
-npm i @telegraf/session pg
+npm i @telegraf/session kysely pg
 npm i --save-dev @types/pg
 ```
 

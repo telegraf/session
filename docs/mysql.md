@@ -3,7 +3,7 @@
 Install the 'mysql2' MySQL driver alongside this module.
 
 ```shell
-npm i @telegraf/session mysql2
+npm i @telegraf/session kysely mysql2
 ```
 
 Usage is pretty straightforward:

@@ -3,7 +3,7 @@
 Install the Better-SQLite3 driver and types alongside this module.
 
 ```shell
-npm i @telegraf/session better-sqlite3
+npm i @telegraf/session kysely better-sqlite3
 npm i --save-dev @types/better-sqlite3
 ```
 
