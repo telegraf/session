@@ -13,7 +13,7 @@ interface NewDatabaseOpts {
 	 *
 	 * @see {@link https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md#new-databasepath-options Better-SQLite3 | new Database}
 	 * */
-	config: Options;
+	config?: Options;
 	/** Called on fatal connection or setup errors */
 	onInitError?: (err: unknown) => void;
 }
@@ -28,8 +28,8 @@ interface ExistingDatabaseOpts {
 export type Opts = NewDatabaseOpts | ExistingDatabaseOpts;
 
 /** @unstable */
-export const Mysql = (opts: Opts) =>
-	KyselyStore({
+export const SQLite = <Session>(opts: Opts) =>
+	KyselyStore<Session>({
 		config:
 			"database" in opts
 				? { dialect: new SqliteDialect({ database: opts.database }) }

@@ -29,8 +29,8 @@ interface ExistingPoolOpts {
 export type Opts = NewPoolOpts | ExistingPoolOpts;
 
 /** @unstable */
-export const MySQL = (opts: Opts) =>
-	KyselyStore({
+export const MySQL = <Session>(opts: Opts) =>
+	KyselyStore<Session>({
 		config:
 			"pool" in opts
 				? { dialect: new MysqlDialect({ pool: opts.pool }) }

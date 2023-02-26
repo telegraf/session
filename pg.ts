@@ -29,8 +29,8 @@ interface ExistingPoolOpts {
 export type Opts = NewPoolOpts | ExistingPoolOpts;
 
 /** @unstable */
-export const Postgres = (opts: Opts) =>
-	KyselyStore({
+export const Postgres = <Session>(opts: Opts) =>
+	KyselyStore<Session>({
 		config:
 			"pool" in opts
 				? { dialect: new PostgresDialect({ pool: opts.pool }) }

@@ -27,17 +27,22 @@ export const Redis = <Session>(opts: Opts): SessionStore<Session> => {
 	if ("client" in opts) client = opts.client;
 	else client = createClient(opts.config);
 
+	const connection = client.connect();
+
 	const prefix = opts.prefix || "telegraf:";
 
 	return {
 		async get(key) {
+			await connection;
 			const value = await client.get(prefix + key);
 			return value ? JSON.parse(value) : undefined;
 		},
 		async set(key: string, session: Session) {
+			await connection;
 			return await client.set(prefix + key, JSON.stringify(session));
 		},
 		async delete(key: string) {
+			await connection;
 			return await client.del(prefix + key);
 		},
 	};
