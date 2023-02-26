@@ -25,10 +25,10 @@ interface ExistingClientOpts {
 	prefix?: string;
 }
 
-export type Opts = NewClientOpts | ExistingClientOpts;
-
 /** @unstable */
-export const Redis = <Session>(opts: Opts): SessionStore<Session> => {
+export function Redis<Session>(opts: NewClientOpts): SessionStore<Session>;
+export function Redis<Session>(opts: ExistingClientOpts): SessionStore<Session>;
+export function Redis<Session>(opts: NewClientOpts | ExistingClientOpts): SessionStore<Session> {
 	let client: Client;
 	if ("client" in opts) client = opts.client;
 	else client = createClient({ ...opts.config, url: opts.url });
@@ -52,4 +52,4 @@ export const Redis = <Session>(opts: Opts): SessionStore<Session> => {
 			return await client.del(prefix + key);
 		},
 	};
-};
+}

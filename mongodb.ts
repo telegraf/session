@@ -32,10 +32,10 @@ interface ExistingClientOpts {
 	onInitError?: (err: unknown) => void;
 }
 
-export type Opts = NewClientOpts | ExistingClientOpts;
-
 /** @unstable */
-export const Mongo = <Session>(opts: Opts): SessionStore<Session> => {
+export function Mongo<Session>(opts: NewClientOpts): SessionStore<Session>;
+export function Mongo<Session>(opts: ExistingClientOpts): SessionStore<Session>;
+export function Mongo<Session>(opts: NewClientOpts | ExistingClientOpts): SessionStore<Session> {
 	interface SessionDoc {
 		key: string;
 		session: Session;
@@ -68,4 +68,4 @@ export const Mongo = <Session>(opts: Opts): SessionStore<Session> => {
 			await collection.deleteOne({ key });
 		},
 	};
-};
+}

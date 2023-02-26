@@ -4,7 +4,7 @@ This package provides official storage adapters for Telegraf v4.12+ sessions [[s
 
 > ⚠️ Very Important!
 >
-> Read one of the following sections before using this module. You're not meant to import the default route!
+> Read one of the following sections before using this module. You're not meant to import the default path!
 
 An in-memory session module is bundled with Telegraf. The following modules are available here:
 
@@ -27,13 +27,17 @@ Usage is pretty straightforward:
 ```TS
 import { Redis } from "@telegraf/session/redis";
 
-const store = Redis({ url: "redis://127.0.0.1:6379" });
+const store = Redis({
+	url: "redis://127.0.0.1:6379",
+});
 
 const bot = new Telegraf(token, opts);
 bot.use(session({ store }));
 
 // the rest of your bot
 ```
+
+To reuse an existing Redis client, use `Redis({ client })` instead.
 
 ## MongoDB
 
@@ -48,13 +52,18 @@ Usage is pretty straightforward:
 ```TS
 import { Mongo } from "@telegraf/session/mongodb";
 
-const store = Mongo({ url: "mongodb://127.0.0.1:27017", database: "telegraf-bot" });
+const store = Mongo({
+	url: "mongodb://127.0.0.1:27017",
+	database: "telegraf-bot",
+});
 
 const bot = new Telegraf(token, opts);
 bot.use(session({ store }));
 
 // the rest of your bot
 ```
+
+To reuse an existing MongoDB client, use `Mongo({ client })` instead.
 
 ## SQLite
 
@@ -70,13 +79,17 @@ Usage is pretty straightforward:
 ```TS
 import { SQLite } from "@telegraf/session/sqlite";
 
-const store = SQLite({ filename: "./telegraf-sessions.sqlite" });
+const store = SQLite({
+	filename: "./telegraf-sessions.sqlite",
+});
 
 const bot = new Telegraf(token, opts);
 bot.use(session({ store }));
 
 // the rest of your bot
 ```
+
+To reuse an existing Better-SQLite3 database instance, use `SQLite({ database })` instead.
 
 ## PostgreSQL
 
@@ -105,6 +118,8 @@ bot.use(session({ store }));
 // the rest of your bot
 ```
 
+To reuse an existing pg pool, use `Postgres({ pool })` instead.
+
 ## MySQL / MariaDB
 
 Install the 'mysql2' MySQL driver alongside this module.
@@ -131,8 +146,10 @@ bot.use(session({ store }));
 // the rest of your bot
 ```
 
+To reuse an existing MySQL2 pool, use `MySQL({ pool })` instead.
+
 ## Background
 
-Since [telegraf#1372](https://github.com/telegraf/telegraf/issues/1372), it has been known that all asynchronous session middleware have been prone to race-conditions. This was addressed in [telegraf#1713](https://github.com/telegraf/telegraf/pull/1713), but third-party session middleware continue to be affected. Since Telegraf 1.12.0, it's recommended that third-party middleware only provide the store parameter for session, instead of implementing session themselves. This way, they can take advantage of the safety provided by Telegraf's builtin session. Of course, if your plugin has an exceptional case, it may need to implement a middleware.
+Since [telegraf#1372](https://github.com/telegraf/telegraf/issues/1372), it has been known that all asynchronous session middleware have been prone to race-conditions. This was addressed in [telegraf#1713](https://github.com/telegraf/telegraf/pull/1713), but third-party session middleware continue to be affected. Since Telegraf 1.12.0, it's recommended that third-party plugins only provide the store parameter for session, instead of implementing session themselves. This way, they can take advantage of the safety provided by Telegraf's builtin session. Of course, if your plugin has an exceptional usecase, it may need to implement its own middleware.
 
-To begin to solve this problem, we officially maintain the 5 most common storage backends. This package is considered beta, and while it appears stable, it may have changes and bugfixes before a semver stable release.
+To begin to solve this problem, we officially maintain the 5 most common storage backends. This package is considered beta, and may have minor breaking changes and bugfixes before a semver stable release. Feedback is welcome via issues and in the group: [TelegrafJSChat](https://t.me/TelegrafJSChat)

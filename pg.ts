@@ -1,6 +1,7 @@
 import { PostgresDialect } from "kysely";
 import { Pool, PoolConfig } from "pg";
 import { KyselyStore } from "./kysely";
+import { SessionStore } from "./types";
 
 interface NewPoolOpts {
 	host?: string | undefined;
@@ -31,11 +32,11 @@ interface ExistingPoolOpts {
 	onInitError?: (err: unknown) => void;
 }
 
-export type Opts = NewPoolOpts | ExistingPoolOpts;
-
 /** @unstable */
-export const Postgres = <Session>(opts: Opts) =>
-	KyselyStore<Session>({
+export function Postgres<Session>(opts: NewPoolOpts): SessionStore<Session>;
+export function Postgres<Session>(opts: ExistingPoolOpts): SessionStore<Session>;
+export function Postgres<Session>(opts: NewPoolOpts | ExistingPoolOpts) {
+	return KyselyStore<Session>({
 		config:
 			"pool" in opts
 				? { dialect: new PostgresDialect({ pool: opts.pool }) }
@@ -54,3 +55,4 @@ export const Postgres = <Session>(opts: Opts) =>
 		table: opts.table,
 		onInitError: opts.onInitError,
 	});
+}
