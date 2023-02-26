@@ -1,14 +1,135 @@
 # `@telegraf/session`
 
-This package provides official storage adapters for Telegraf v4.12+ sessions.
+This package provides official storage adapters for Telegraf v4.12+ sessions [[see motivation]](#background).
 
-An in-memory session module is bundled with Telegraf. These modules are available here:
+> ⚠️ Very Important!
+>
+> Read one of the following sections before using this module. You're not meant to import the default route!
 
--   [Redis](./docs/redis.md)
--   [MongoDB](./docs/mongodb.md)
--   [SQLite](./docs/sqlite.md)
--   [PostgreSQL](./docs/pg.md)
--   [MySQL / MariaDB](./docs/mysql.md)
+An in-memory session module is bundled with Telegraf. The following modules are available here:
+
+-   [Redis](#redis)
+-   [MongoDB](#mongodb)
+-   [SQLite](#sqlite)
+-   [PostgreSQL](#postgresql)
+-   [MySQL / MariaDB](#mysql--mariadb)
+
+## Redis
+
+Install the official Redis driver alongside this module.
+
+```shell
+npm i @telegraf/session redis
+```
+
+Usage is pretty straightforward:
+
+```TS
+import { Redis } from "@telegraf/session/redis";
+
+const store = Redis({ url: "redis://127.0.0.1:6379" });
+
+const bot = new Telegraf(token, opts);
+bot.use(session({ store }));
+
+// the rest of your bot
+```
+
+## MongoDB
+
+Install the official MongoDB driver alongside this module.
+
+```shell
+npm i @telegraf/session mongodb
+```
+
+Usage is pretty straightforward:
+
+```TS
+import { Mongo } from "@telegraf/session/mongodb";
+
+const store = Mongo({ url: "mongodb://127.0.0.1:27017", database: "telegraf-bot" });
+
+const bot = new Telegraf(token, opts);
+bot.use(session({ store }));
+
+// the rest of your bot
+```
+
+## SQLite
+
+Install the Better-SQLite3 driver and types alongside this module.
+
+```shell
+npm i @telegraf/session kysely better-sqlite3
+npm i --save-dev @types/better-sqlite3
+```
+
+Usage is pretty straightforward:
+
+```TS
+import { SQLite } from "@telegraf/session/sqlite";
+
+const store = SQLite({ filename: "./telegraf-sessions.sqlite" });
+
+const bot = new Telegraf(token, opts);
+bot.use(session({ store }));
+
+// the rest of your bot
+```
+
+## PostgreSQL
+
+Install the 'pg' PostgreSQL driver and types alongside this module.
+
+```shell
+npm i @telegraf/session kysely pg
+npm i --save-dev @types/pg
+```
+
+Usage is pretty straightforward:
+
+```TS
+import { Postgres } from "@telegraf/session/pg";
+
+const store = Postgres({
+	host: "127.0.0.1",
+	database: "telegraf-test",
+	user: "database-user",
+	password: "hunter2",
+});
+
+const bot = new Telegraf(token, opts);
+bot.use(session({ store }));
+
+// the rest of your bot
+```
+
+## MySQL / MariaDB
+
+Install the 'mysql2' MySQL driver alongside this module.
+
+```shell
+npm i @telegraf/session kysely mysql2
+```
+
+Usage is pretty straightforward:
+
+```TS
+import { MySQL } from "@telegraf/session/mysql";
+
+const store = MySQL({
+	host: "127.0.0.1",
+	database: "telegraf-test",
+	user: "database-user",
+	password: "hunter2",
+});
+
+const bot = new Telegraf(token, opts);
+bot.use(session({ store }));
+
+// the rest of your bot
+```
 
 ## Background
 

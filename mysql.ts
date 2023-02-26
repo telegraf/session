@@ -3,6 +3,11 @@ import { createPool, Pool, PoolOptions } from "mysql2";
 import { KyselyStore } from "./kysely";
 
 interface NewPoolOpts {
+	host?: string | undefined;
+	port?: number | undefined;
+	database?: string | undefined;
+	user?: string | undefined;
+	password?: string;
 	/**
 	 * MySQL2 Pool options.
 	 *
@@ -10,7 +15,7 @@ interface NewPoolOpts {
 	 *
 	 * @see {@link https://github.com/sidorares/node-mysql2#using-connection-pools Node MySQL 2 | Using connection pools}
 	 * */
-	config: PoolOptions;
+	config: Omit<PoolOptions, "host" | "port" | "database" | "user" | "password">;
 	/** Table name to use for sessions. Defaults to "telegraf-sessions". */
 	table?: string;
 	/** Called on fatal connection or setup errors */
@@ -34,7 +39,18 @@ export const MySQL = <Session>(opts: Opts) =>
 		config:
 			"pool" in opts
 				? { dialect: new MysqlDialect({ pool: opts.pool }) }
-				: { dialect: new MysqlDialect({ pool: createPool(opts.config) }) },
+				: {
+						dialect: new MysqlDialect({
+							pool: createPool({
+								host: opts.host,
+								port: opts.port,
+								database: opts.database,
+								user: opts.user,
+								password: opts.password,
+								...opts.config,
+							}),
+						}),
+				  },
 		table: opts.table,
 		onInitError: opts.onInitError,
 	});

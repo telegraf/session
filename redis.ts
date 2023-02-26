@@ -5,7 +5,13 @@ import { SessionStore } from "./types";
 type Client = ReturnType<typeof createClient>;
 
 interface NewClientOpts {
-	config: RedisClientOptions;
+	/**
+	 * `redis[s]://[[username][:password]@][host][:port][/db-number]`
+	 *
+	 * See [`redis`](https://www.iana.org/assignments/uri-schemes/prov/redis) and [`rediss`](https://www.iana.org/assignments/uri-schemes/prov/rediss) IANA registration for more details
+	 */
+	url?: string;
+	config: Omit<RedisClientOptions, "url">;
 	/** Prefix to use for session keys. Defaults to "telegraf:". */
 	prefix?: string;
 	/** Called on fatal connection or setup errors */
@@ -25,7 +31,7 @@ export type Opts = NewClientOpts | ExistingClientOpts;
 export const Redis = <Session>(opts: Opts): SessionStore<Session> => {
 	let client: Client;
 	if ("client" in opts) client = opts.client;
-	else client = createClient(opts.config);
+	else client = createClient({ ...opts.config, url: opts.url });
 
 	const connection = client.connect();
 
