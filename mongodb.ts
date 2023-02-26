@@ -13,6 +13,8 @@ interface NewClientOpts {
 	 * @see {@link https://www.mongodb.com/docs/drivers/node/current/fundamentals/connection/connection-options MongoDB | Connection Options}
 	 * */
 	config?: MongoClientOptions;
+	/** The name of the database we want to use. If not provided, database name will be taken from connection string. */
+	database?: string;
 	/** MongoDB collection name to use for sessions. Defaults to "telegraf-sessions". */
 	collection?: string;
 	/** Called on fatal connection or setup errors */
@@ -22,6 +24,8 @@ interface NewClientOpts {
 interface ExistingClientOpts {
 	/** If passed, we'll reuse this client instead of creating our own. */
 	client: MongoClient;
+	/** The name of the database we want to use. If not provided, database name will be taken from connection string. */
+	database?: string;
 	/** MongoDB collection name to use for sessions. Defaults to "telegraf-sessions". */
 	collection?: string;
 	/** Called on fatal connection or setup errors */
@@ -37,7 +41,7 @@ export const Mongo = <Session>(opts: Opts): SessionStore<Session> => {
 		session: Session;
 	}
 
-	let client;
+	let client: MongoClient;
 	let connection: Promise<MongoClient> | undefined;
 
 	if ("client" in opts) client = opts.client;
@@ -47,7 +51,7 @@ export const Mongo = <Session>(opts: Opts): SessionStore<Session> => {
 		connection.catch(opts.onInitError);
 	}
 
-	const collection = client.db().collection<SessionDoc>(opts.collection ?? defaults.table);
+	const collection = client.db(opts.database).collection<SessionDoc>(opts.collection ?? defaults.table);
 
 	return {
 		async get(key) {
