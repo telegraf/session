@@ -1,7 +1,7 @@
 {
 	"name": "@telegraf/session",
-	"version": "2.0.0-beta.1",
-	"description": "Session adapters for Telegraf",
+	"version": "2.0.0-beta.2",
+	"description": "Session store adapters for Telegraf",
 	"main": "./memory.js",
 	"scripts": {
 		"clean": "rimraf ./*.js ./*.d.ts",
@@ -20,6 +20,28 @@
 		"./*.js",
 		"./*.d.ts"
 	],
+	"exports": {
+		"./mongodb": {
+			"default": "./mongodb.js",
+			"types": "./mongodb.d.ts"
+		},
+		"./redis": {
+			"default": "./redis.js",
+			"types": "./redis.d.ts"
+		},
+		"./mysql": {
+			"default": "./mysql.js",
+			"types": "./mysql.d.ts"
+		},
+		"./pg": {
+			"default": "./pg.js",
+			"types": "./pg.d.ts"
+		},
+		"./sqlite": {
+			"default": "./sqlite.js",
+			"types": "./sqlite.d.ts"
+		}
+	},
 	"peerDependencies": {
 		"@types/better-sqlite3": "^7.6.3",
 		"@types/pg": "^8.6.6",
