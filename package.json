@@ -1,6 +1,6 @@
 {
 	"name": "@telegraf/session",
-	"version": "2.0.0-beta.3",
+	"version": "2.0.0-beta.4",
 	"description": "Session store adapters for Telegraf",
 	"main": "./memory.js",
 	"scripts": {
@@ -40,6 +40,10 @@
 		"./sqlite": {
 			"default": "./sqlite.js",
 			"types": "./sqlite.d.ts"
+		},
+		"./surrealdb": {
+			"default": "./surrealdb.js",
+			"types": "./surrealdb.d.ts"
 		}
 	},
 	"peerDependencies": {
@@ -50,7 +54,8 @@
 		"mongodb": "^5.0.1",
 		"mysql2": "^3.1.2",
 		"pg": "^8.9.0",
-		"redis": "^4.6.4"
+		"redis": "^4.6.4",
+		"surrealdb.js": "^0.5.0"
 	},
 	"peerDependenciesMeta": {
 		"@types/better-sqlite3": {
@@ -76,6 +81,9 @@
 		},
 		"redis": {
 			"optional": true
+		},
+		"surrealdb.js": {
+			"optional": true
 		}
 	},
 	"devDependencies": {
@@ -88,6 +96,7 @@
 		"pg": "^8.9.0",
 		"redis": "^4.6.4",
 		"rimraf": "^3.0.2",
+		"surrealdb.js": "^0.5.0",
 		"typescript": "^4.8.4"
 	}
 }
