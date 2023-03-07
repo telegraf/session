@@ -3,8 +3,6 @@
 import * as Surreal from "surrealdb.js";
 import { SessionStore } from "./types";
 import {defaults} from "./defaults";
-import {MongoClient} from "mongodb";
-
 
 type TSurrealRecord = {
 	id: string;
