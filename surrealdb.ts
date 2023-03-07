@@ -3,6 +3,7 @@
 import * as Surreal from "surrealdb.js";
 import { SessionStore } from "./types";
 import {defaults} from "./defaults";
+import {MongoClient} from "mongodb";
 
 
 type TSurrealRecord = {
@@ -19,6 +20,7 @@ interface NewClientOpts {
 
 interface ExistingClientOpts {
 	client: Surreal.default;
+	onInitError?: (err: unknown) => void;
 }
 
 export function SurrealDB<Session>(opts: NewClientOpts): SessionStore<Session>;
@@ -29,38 +31,36 @@ export function SurrealDB<Session>(opts: NewClientOpts | ExistingClientOpts): Se
 		session: Session;
 	}
 
-	let client: Surreal.default;
-
-	if ("client" in opts) client = opts.client;
-	else {
-		client = new Surreal.default(`${opts.url}/rpc`);
-		client.signin(opts.auth!)
-			.then(async () => {
-				await client.use(opts.namespace!, opts.database!);
-			})
-			.catch(opts.onInitError!);
-	}
-
 	// Small changes associated with the naming rules:
 	// - replacement "-" on "_" in the name of the base,
 	// - replacement ":" on "_" in the identifier.
 	const surrealDefaultTable = defaults.table.replace(/-/g, '_');
 	const surrealId = (key: string): string => `${surrealDefaultTable}:${key.replace(/:/g, '_')}`;
+	let client: Surreal.default;
+
+	if ("client" in opts) client = opts.client;
+	else {
+		client = new Surreal.default(`${opts.url}/rpc`);
+		const conn = client.wait();
+		conn.catch(opts.onInitError);
+		client.signin(opts.auth!)
+			.then(() => {
+				client.use(opts.namespace ?? 'telegraf_session', opts.database ?? surrealDefaultTable);
+			})
+			.catch(opts.onInitError!);
+	}
 
 	return {
 		async get(key) {
-			await client.wait();
 			const resp = await client.query(`SELECT * FROM ${surrealDefaultTable} WHERE id=${surrealId(key)}`);
 			const result: TSurrealRecord[] = resp[0].result as TSurrealRecord[];
 			if (result.length === 0) return undefined;
 			return  result[0].value;
 		},
 		async set(key: string, session: Session) {
-			await client.wait();
 			return await client.update(surrealId(key), {value: session});
 		},
 		async delete(key: string) {
-			await client.wait();
 			return await client.delete(surrealId(key));
 		},
 	};
