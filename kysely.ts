@@ -83,7 +83,10 @@ export const KyselyStore = <Session>(opts: Opts): SessionStore<Session> => {
 		async delete(key: string) {
 			await create;
 
-			await client.deleteFrom(table).where("key", "=", key);
+			await client //
+				.deleteFrom(table)
+				.where("key", "=", key)
+				.executeTakeFirst();
 		},
 	};
 };
