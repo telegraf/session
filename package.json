@@ -1,6 +1,6 @@
 {
 	"name": "@telegraf/session",
-	"version": "2.0.0-beta.4",
+	"version": "2.0.0-beta.5",
 	"description": "Session store adapters for Telegraf",
 	"main": "./memory.js",
 	"homepage": "https://github.com/telegraf/session",
