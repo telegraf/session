@@ -1,4 +1,4 @@
-import { Kysely } from "kysely";
+import { Kysely, MysqlDialect } from "kysely";
 import type { KyselyConfig } from "kysely";
 import type { SessionStore } from "./types";
 import { defaults } from "./defaults";
@@ -27,30 +27,17 @@ interface NewClientOpts {
 	onInitError?: (err: unknown) => void;
 }
 
-interface ExistingClientOpts {
-	/** If passed, we'll reuse this client instead of creating our own. */
-	client: Kysely<Database>;
-	/** Table name to use for sessions. Defaults to "telegraf-sessions". */
-	table?: string;
-	/** Called on fatal connection or setup errors */
-	onInitError?: (err: unknown) => void;
-}
-
-export type Opts = NewClientOpts | ExistingClientOpts;
-
 /** @unstable */
-export const KyselyStore = <Session>(opts: Opts): SessionStore<Session> => {
+export const KyselyStore = <Session>(opts: NewClientOpts): SessionStore<Session> => {
 	// this assertion is a hack to make the Database type work
 	const table = (opts.table ?? defaults.table) as "telegraf-sessions";
 
-	let client: Kysely<Database>;
-	if ("client" in opts) client = opts.client;
-	else client = new Kysely(opts.config);
+	const client: Kysely<Database> = new Kysely(opts.config);
 
 	const create = client.schema
 		.createTable(table)
 		.ifNotExists()
-		.addColumn("key", "varchar(32)", col => col.notNull())
+		.addColumn("key", "varchar(32)", col => col.primaryKey().notNull())
 		.addColumn("session", "text")
 		.execute();
 
@@ -66,19 +53,29 @@ export const KyselyStore = <Session>(opts: Opts): SessionStore<Session> => {
 					.selectFrom(table)
 					.select("session")
 					.where("key", "=", key)
+					.limit(1)
 					.executeTakeFirst()
 			)?.session;
 
 			return value ? JSON.parse(value) : undefined;
 		},
-		async set(key: string, session: Session) {
+		async set(key: string, value: Session) {
 			await create;
 
-			await client
-				.updateTable(table)
-				.set({ session: JSON.stringify(session) })
-				.where("key", "=", key)
-				.executeTakeFirst();
+			const session = JSON.stringify(value);
+
+			const res = await (opts.config.dialect instanceof MysqlDialect
+				? client
+						.insertInto(table)
+						.values({ key, session })
+						// MySQL has ON DUPLICATE KEY UPDATE
+						.onDuplicateKeyUpdate({ session })
+				: client
+						.insertInto(table)
+						.values({ key, session })
+						// Postgres and SQLITE have ON CONFLICT DO UPDATE SET
+						.onConflict(b => b.column("key").doUpdateSet({ session }))
+			).executeTakeFirst();
 		},
 		async delete(key: string) {
 			await create;
