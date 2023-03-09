@@ -16,7 +16,7 @@ interface NewPoolOpts {
 	 *
 	 * @see {@link https://node-postgres.com/apis/pool node-postgres | Pool Options}
 	 * */
-	config: Omit<PoolConfig, "host" | "port" | "database" | "user" | "password">;
+	config?: Omit<PoolConfig, "host" | "port" | "database" | "user" | "password">;
 	/** Table name to use for sessions. Defaults to "telegraf-sessions". */
 	table?: string;
 	/** Called on fatal connection or setup errors */

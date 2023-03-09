@@ -16,7 +16,7 @@ interface NewPoolOpts {
 	 *
 	 * @see {@link https://github.com/sidorares/node-mysql2#using-connection-pools Node MySQL 2 | Using connection pools}
 	 * */
-	config: Omit<PoolOptions, "host" | "port" | "database" | "user" | "password">;
+	config?: Omit<PoolOptions, "host" | "port" | "database" | "user" | "password">;
 	/** Table name to use for sessions. Defaults to "telegraf-sessions". */
 	table?: string;
 	/** Called on fatal connection or setup errors */

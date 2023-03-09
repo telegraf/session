@@ -11,7 +11,7 @@ interface NewClientOpts {
 	 * See [`redis`](https://www.iana.org/assignments/uri-schemes/prov/redis) and [`rediss`](https://www.iana.org/assignments/uri-schemes/prov/rediss) IANA registration for more details
 	 */
 	url?: string;
-	config: Omit<RedisClientOptions, "url">;
+	config?: Omit<RedisClientOptions, "url">;
 	/** Prefix to use for session keys. Defaults to "telegraf:". */
 	prefix?: string;
 	/** Called on fatal connection or setup errors */
