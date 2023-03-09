@@ -3,6 +3,14 @@
 	"version": "2.0.0-beta.4",
 	"description": "Session store adapters for Telegraf",
 	"main": "./memory.js",
+	"homepage": "https://github.com/telegraf/session",
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@github.com/telegraf/session.git"
+	},
+	"bugs": {
+		"url": "https://github.com/telegraf/session/issues"
+	},
 	"scripts": {
 		"clean": "rimraf ./*.js ./*.d.ts",
 		"prepare": "rimraf ./*.js ./*.d.ts && tsc"
