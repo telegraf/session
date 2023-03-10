@@ -1,6 +1,6 @@
 {
 	"name": "@telegraf/session",
-	"version": "2.0.0-beta.5",
+	"version": "2.0.0-beta.6",
 	"description": "Session store adapters for Telegraf",
 	"main": "./memory.js",
 	"homepage": "https://github.com/telegraf/session",
@@ -30,24 +30,24 @@
 	],
 	"exports": {
 		"./mongodb": {
-			"default": "./mongodb.js",
-			"types": "./mongodb.d.ts"
+			"types": "./mongodb.d.ts",
+			"default": "./mongodb.js"
 		},
 		"./redis": {
-			"default": "./redis.js",
-			"types": "./redis.d.ts"
+			"types": "./redis.d.ts",
+			"default": "./redis.js"
 		},
 		"./mysql": {
-			"default": "./mysql.js",
-			"types": "./mysql.d.ts"
+			"types": "./mysql.d.ts",
+			"default": "./mysql.js"
 		},
 		"./pg": {
-			"default": "./pg.js",
-			"types": "./pg.d.ts"
+			"types": "./pg.d.ts",
+			"default": "./pg.js"
 		},
 		"./sqlite": {
-			"default": "./sqlite.js",
-			"types": "./sqlite.d.ts"
+			"types": "./sqlite.d.ts",
+			"default": "./sqlite.js"
 		}
 	},
 	"peerDependencies": {
