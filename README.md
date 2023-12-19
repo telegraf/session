@@ -2,9 +2,8 @@
 
 This package provides official storage adapters for Telegraf v4.12+ sessions [[see motivation]](#background).
 
-> ⚠️ Very Important!
->
-> Read one of the following sections before using this module. You're not meant to import the default path!
+> [!WARNING]
+> **You're not meant to import the default path!** Read one of the following sections before using this module.
 
 An in-memory session module is bundled with Telegraf. The following modules are available here:
 
