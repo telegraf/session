@@ -1,6 +1,6 @@
 {
 	"name": "@telegraf/session",
-	"version": "2.0.0-beta.6",
+	"version": "2.0.0-beta.7",
 	"description": "Session store adapters for Telegraf",
 	"main": "./memory.js",
 	"homepage": "https://github.com/telegraf/session",
@@ -51,14 +51,15 @@
 		}
 	},
 	"peerDependencies": {
-		"@types/better-sqlite3": "^7.6.3",
-		"@types/pg": "^8.6.6",
-		"better-sqlite3": "^8.1.0",
-		"kysely": "^0.23.4",
-		"mongodb": "^5.0.1",
-		"mysql2": "^3.1.2",
-		"pg": "^8.9.0",
-		"redis": "^4.6.4"
+		"@types/better-sqlite3": "^7.6.9",
+		"@types/pg": "^8.11.0",
+		"better-sqlite3": "^9.3.0",
+		"kysely": "0.27.2 <1",
+		"mongodb": "^6.3.0",
+		"mysql2": "^3.9.0",
+		"pg": "^8.11.3",
+		"redis": "^4.6.12",
+		"telegraf": ">=4.12.0"
 	},
 	"peerDependenciesMeta": {
 		"@types/better-sqlite3": {
@@ -87,15 +88,16 @@
 		}
 	},
 	"devDependencies": {
-		"@types/better-sqlite3": "^7.6.3",
-		"@types/pg": "^8.6.6",
-		"better-sqlite3": "^8.1.0",
-		"kysely": "^0.23.4",
-		"mongodb": "^5.0.1",
-		"mysql2": "^3.1.2",
-		"pg": "^8.9.0",
-		"redis": "^4.6.4",
-		"rimraf": "^3.0.2",
-		"typescript": "^4.8.4"
+		"@types/better-sqlite3": "^7.6.9",
+		"@types/pg": "^8.11.0",
+		"better-sqlite3": "^9.3.0",
+		"kysely": "^0.27.2",
+		"mongodb": "^6.3.0",
+		"mysql2": "^3.9.0",
+		"pg": "^8.11.3",
+		"redis": "^4.6.12",
+		"rimraf": "^5.0.5",
+		"telegraf": "^4.15.3",
+		"typescript": "^5.3.3"
 	}
 }
