@@ -7,7 +7,7 @@ import {
 	TableDescription,
 	Types,
 	TypedData,
-	ReadTableSettings
+	ReadTableSettings, TypedValues
 } from 'ydb-sdk';
 
 import { SessionStore } from "./types";
@@ -55,7 +55,7 @@ export function YDB<Session>(opts: NewClientOpts | ExistingClientOpts): SessionS
 				opts.StaticCredentials.password,
 				opts.endpointUrl,
 			{
-					tokenExpirationTimeout: 20000,
+					tokenExpirationTimeout: opts.tokenExpirationTimeout,
 			})
 
 		client = new Driver({endpoint: opts.endpointUrl, database: opts.databaseName, authService})
@@ -72,52 +72,72 @@ export function YDB<Session>(opts: NewClientOpts | ExistingClientOpts): SessionS
 								}, opts.connectionTimeout)
 
 	return {
-		async get(key) {
+		async get(key: string) {
 
-			const keyIValue = {value: {textValue: key}}
+			const query = `
+					DECLARE $keyValue AS TEXT;
+					$table_name = "${tablename}";
+					select key, session from $table_name
+					where key= $keyValue`
+
+			const params = {
+				'$keyValue': TypedValues.text(key),
+			};
+
 			let value: string | undefined | null
 
 			await connection
 			await create
 
-			await client.tableClient.withSession(async session=>{
-				await session.streamReadTable(tablename,result => {
-					const resultSet = result.resultSet;
-					if (resultSet) {
-						const data = TypedData.createNativeObjects(resultSet);
-						if(data.length >= 0) value = data[0].getValue("session").textValue
-					}
-				}, new ReadTableSettings()
-					.withColumns("session")
-					.withKeyRange({greaterOrEqual: keyIValue , lessOrEqual: keyIValue })
-					.withRowLimit(1)
-				)
+			await client.tableClient.withSession(async session=> {
+				const result = await session.executeQuery(query, params)
+				if(result.resultSets.length > 0) {
+					const resultSet = result.resultSets[0];
+					const data = TypedData.createNativeObjects(resultSet);
+					if (data.length > 0) value = data[0].getValue("session").textValue
+				}
 			})
 
 			return value ? JSON.parse(value) : undefined;
 		},
 		async set(key: string, session: Session) {
 
-			const query = `UPSERT INTO ${tablename}
-    							( 'key', 'session' )
-								VALUES ( '${key}', '${JSON.stringify(session)}');`
+			const query = `
+								DECLARE $keyValue AS TEXT;
+								DECLARE $sessionValue AS TEXT;
+								$table_name = "${tablename}";
+								UPSERT INTO $table_name	(key, session)
+								VALUES ( $keyValue, $sessionValue);`
+
+			const params = {
+				'$keyValue': TypedValues.text(key),
+				'$sessionValue':TypedValues.text(JSON.stringify(session))
+			};
 
 			await connection
 			await create
 
 			await client.tableClient.withSession(async ydbSession => {
-				await ydbSession.executeQuery(query)
+				await ydbSession.executeQuery(query, params)
 			})
 
 		},
 		async delete(key: string) {
 
+			const query = `
+								DECLARE $keyValue AS TEXT;
+								$table_name = "${tablename}";
+								delete from $table_name where key = $keyValue`
+
+			const params = {
+				'$keyValue': TypedValues.text(key)
+			};
+
 			await connection
 			await create
 
-			const query = `delete from ${tablename} where key = '${key}'`
 			return await client.tableClient.withSession(async session => {
-				await session.executeQuery(query)
+				await session.executeQuery(query, params)
 			})
 		},
 	};

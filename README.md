@@ -159,10 +159,17 @@ npm i @telegraf/session ydb-sdk
 Usage is pretty straightforward:
 
 ```TS
-import { Redis } from "@telegraf/session/redis";
+import { YDB } from "@telegraf/session/Ydb";
 
-const store = Redis({
-	url: "redis://127.0.0.1:6379",
+YDB({
+        StaticCredentials: {
+          user: "admin",
+          password: ""
+        },
+        endpointUrl: "grpc://localhost:2136",
+        databaseName: "local",
+        tokenExpirationTimeout: 20000,
+        connectionTimeout: 10000,
 });
 
 const bot = new Telegraf(token, opts);
@@ -171,7 +178,7 @@ bot.use(session({ store }));
 // the rest of your bot
 ```
 
-To reuse an existing Redis client, use `Redis({ client })` instead.
+To reuse an existing Redis client, use `YDB({ client })` instead.
 
 ## Background
 
