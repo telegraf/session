@@ -12,6 +12,7 @@ An in-memory session module is bundled with Telegraf. The following modules are 
 -   [SQLite](#sqlite)
 -   [PostgreSQL](#postgresql)
 -   [MySQL / MariaDB](#mysql--mariadb)
+-   [YDB](#ydb)
 
 ## Redis
 
@@ -146,6 +147,31 @@ bot.use(session({ store }));
 ```
 
 To reuse an existing MySQL2 pool, use `MySQL({ pool })` instead.
+
+## Ydb
+
+Install the official Ydb driver alongside this module.
+
+```shell
+npm i @telegraf/session ydb-sdk
+```
+
+Usage is pretty straightforward:
+
+```TS
+import { Redis } from "@telegraf/session/redis";
+
+const store = Redis({
+	url: "redis://127.0.0.1:6379",
+});
+
+const bot = new Telegraf(token, opts);
+bot.use(session({ store }));
+
+// the rest of your bot
+```
+
+To reuse an existing Redis client, use `Redis({ client })` instead.
 
 ## Background
 
