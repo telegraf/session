@@ -12,6 +12,7 @@ An in-memory session module is bundled with Telegraf. The following modules are 
 -   [SQLite](#sqlite)
 -   [PostgreSQL](#postgresql)
 -   [MySQL / MariaDB](#mysql--mariadb)
+-   [YDB](#ydb)
 
 ## Redis
 
@@ -146,6 +147,58 @@ bot.use(session({ store }));
 ```
 
 To reuse an existing MySQL2 pool, use `MySQL({ pool })` instead.
+
+## Ydb
+
+Install the official [Ydb](https://ydb.tech) driver alongside this module.
+
+```shell
+npm i @telegraf/session ydb-sdk
+```
+
+Usage is pretty straightforward:
+
+```TS
+import { YDB } from "@telegraf/session/Ydb";
+
+const store = YDB({
+
+// Anonymous authentication will be performed without specifying authentication options 
+
+/* Static сredentials
+        authOptions: {
+          authType: AuthTypes.Static,
+          user: "username",
+          password: "password"
+        },
+*/
+
+/* Сredentials from environment vars 
+        authOptions: {
+          authType: AuthTypes.Environment,
+        },
+*/
+
+/* Сredentials from JSON file 
+        authOptions: {
+          authType: AuthTypes.Json,
+          jsonFileName: "full path filename"
+        },
+*/
+
+        endpointUrl: "grpc://localhost:2136",
+        databaseName: "local",
+        tokenExpirationTimeout: 20000,
+        connectionTimeout: 10000,
+})
+
+const bot = new Telegraf(token, opts);
+bot.use(session({ store }));
+
+// the rest of your bot
+```
+
+To reuse an existing YDB client, use `YDB({ client })` instead.
 
 ## Background
 

@@ -12,15 +12,16 @@
 		"url": "https://github.com/telegraf/session/issues"
 	},
 	"scripts": {
-		"clean": "rimraf ./*.js ./*.d.ts",
-		"prepare": "rimraf ./*.js ./*.d.ts && tsc"
+		"clean": "rimraf --glob ./*.js ./*.d.ts",
+		"prepare": "rimraf --glob ./*.js ./*.d.ts && tsc"
 	},
 	"keywords": [
 		"telegraf",
 		"telegram",
 		"bot",
 		"session",
-		"mongodb"
+		"mongodb",
+		"ydb"
 	],
 	"author": "Muthu Kumar <@MKRhere> (https://mkr.pw)",
 	"license": "MIT",
@@ -48,6 +49,10 @@
 		"./sqlite": {
 			"types": "./sqlite.d.ts",
 			"default": "./sqlite.js"
+		},
+		"./Ydb": {
+			"types": "./Ydb.d.ts",
+			"default": "./Ydb.js"
 		}
 	},
 	"peerDependencies": {
@@ -59,7 +64,8 @@
 		"mysql2": "^3.9.0",
 		"pg": "^8.11.3",
 		"redis": "^4.6.12",
-		"telegraf": ">=4.12.0"
+		"telegraf": ">=4.12.0",
+		"ydb-sdk": "^5.1.1"
 	},
 	"peerDependenciesMeta": {
 		"@types/better-sqlite3": {
@@ -85,6 +91,9 @@
 		},
 		"redis": {
 			"optional": true
+		},
+		"ydb-sdk": {
+			"optional": true
 		}
 	},
 	"devDependencies": {
@@ -99,5 +108,9 @@
 		"rimraf": "^5.0.5",
 		"telegraf": "^4.15.3",
 		"typescript": "^5.3.3"
+	},
+	"dependencies": {
+		"@telegraf/session": "^2.0.0-beta.7",
+		"ydb-sdk": "^5.1.1"
 	}
 }
