@@ -161,7 +161,7 @@ Usage is pretty straightforward:
 ```TS
 import { YDB } from "@telegraf/session/Ydb";
 
-YDB({
+const store = YDB({
 
 // Anonymous authentication will be performed without specifying authentication options 
 
@@ -198,7 +198,7 @@ bot.use(session({ store }));
 // the rest of your bot
 ```
 
-To reuse an existing Redis client, use `YDB({ client })` instead.
+To reuse an existing YDB client, use `YDB({ client })` instead.
 
 ## Background
 
