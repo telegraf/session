@@ -3,23 +3,52 @@ import {
 	Column,
 	Driver,
 	getCredentialsFromEnv,
-	Logger,
 	TableDescription,
 	Types,
 	TypedData,
-	ReadTableSettings, TypedValues
+	TypedValues, IAuthService, getSACredentialsFromJson, IamAuthService, AnonymousAuthService, Session as YdbSession
 } from 'ydb-sdk';
 
 import { SessionStore } from "./types";
 import { defaults } from "./defaults";
 
+//#region AuthOptions
+export enum AuthTypes {
+	Static,
+	Environment,
+	Json
+}
+
+interface IStaticCredentials {
+
+	authType: AuthTypes.Static,
+	user:string,
+	password:string
+}
+interface IJSONCredentials {
+	authType: AuthTypes.Json,
+	jsonFileName: string
+}
+interface IEnvCredentials {
+	authType: AuthTypes.Environment
+}
+
+type AuthOptionsType = IStaticCredentials | IEnvCredentials | IJSONCredentials
+
+function isStaticCredentialsAuthOptions(authOptions: AuthOptionsType): authOptions is IStaticCredentials {
+	return authOptions.authType === AuthTypes.Static
+}
+function isEnvCredentialsAuthOptions(authOptions: AuthOptionsType): authOptions is IEnvCredentials {
+	return authOptions.authType === AuthTypes.Environment
+}
+function isJsonCredentialsAuthOptions(authOptions: AuthOptionsType): authOptions is IJSONCredentials {
+	return authOptions.authType === AuthTypes.Json
+}
+//#endregion
+
 interface NewClientOpts {
 
-	//static
-	StaticCredentials: {
-		user:string
-		password:string
-	}
+	authOptions?: AuthOptionsType
 
 	tokenExpirationTimeout: number
 	endpointUrl: string
@@ -37,6 +66,8 @@ interface ExistingClientOpts {
 	connectionTimeout: number
 }
 
+
+
 /** @unstable */
 export function YDB<Session>(opts: NewClientOpts): SessionStore<Session>;
 export function YDB<Session>(opts: ExistingClientOpts): SessionStore<Session>;
@@ -47,16 +78,27 @@ export function YDB<Session>(opts: NewClientOpts | ExistingClientOpts): SessionS
 
 	let client: Driver;
 	let connection: Promise<boolean> | undefined;
+	let authService: IAuthService = new AnonymousAuthService()
 
 	if ("client" in opts) client = opts.client;
 	else {
-		const authService = new StaticCredentialsAuthService(
-				opts.StaticCredentials.user,
-				opts.StaticCredentials.password,
-				opts.endpointUrl,
-			{
-					tokenExpirationTimeout: opts.tokenExpirationTimeout,
-			})
+		if(opts.authOptions) {
+			if (isStaticCredentialsAuthOptions(opts.authOptions)) {
+				authService = new StaticCredentialsAuthService(
+					opts.authOptions.user,
+					opts.authOptions.password,
+					opts.endpointUrl,
+					{
+						tokenExpirationTimeout: opts.tokenExpirationTimeout,
+					})
+			}
+			if (isEnvCredentialsAuthOptions(opts.authOptions)) {
+				authService = getCredentialsFromEnv()
+			}
+			if (isJsonCredentialsAuthOptions(opts.authOptions)) {
+				authService = new IamAuthService(getSACredentialsFromJson(opts.authOptions.jsonFileName))
+			}
+		}
 
 		client = new Driver({endpoint: opts.endpointUrl, database: opts.databaseName, authService})
 		connection = client.ready(opts.connectionTimeout)
@@ -89,12 +131,12 @@ export function YDB<Session>(opts: NewClientOpts | ExistingClientOpts): SessionS
 			await connection
 			await create
 
-			await client.tableClient.withSession(async session=> {
-				const result = await session.executeQuery(query, params)
+			await client.tableClient.withSession(async (ydbSession: YdbSession) => {
+				const result = await ydbSession.executeQuery(query, params)
 				if(result.resultSets.length > 0) {
 					const resultSet = result.resultSets[0];
 					const data = TypedData.createNativeObjects(resultSet);
-					if (data.length > 0) value = data[0].getValue("session").textValue
+					if (data.length > 0 && data[0].hasOwnProperty("session")) value = data[0]["session"]
 				}
 			})
 
@@ -117,7 +159,7 @@ export function YDB<Session>(opts: NewClientOpts | ExistingClientOpts): SessionS
 			await connection
 			await create
 
-			await client.tableClient.withSession(async ydbSession => {
+			await client.tableClient.withSession(async (ydbSession: YdbSession) => {
 				await ydbSession.executeQuery(query, params)
 			})
 
@@ -136,8 +178,8 @@ export function YDB<Session>(opts: NewClientOpts | ExistingClientOpts): SessionS
 			await connection
 			await create
 
-			return await client.tableClient.withSession(async session => {
-				await session.executeQuery(query, params)
+			return await client.tableClient.withSession(async (ydbSession: YdbSession) => {
+				await ydbSession.executeQuery(query, params)
 			})
 		},
 	};

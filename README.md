@@ -150,7 +150,7 @@ To reuse an existing MySQL2 pool, use `MySQL({ pool })` instead.
 
 ## Ydb
 
-Install the official Ydb driver alongside this module.
+Install the official [Ydb](https://ydb.tech) driver alongside this module.
 
 ```shell
 npm i @telegraf/session ydb-sdk
@@ -162,15 +162,35 @@ Usage is pretty straightforward:
 import { YDB } from "@telegraf/session/Ydb";
 
 YDB({
-        StaticCredentials: {
-          user: "admin",
-          password: ""
+
+// Anonymous authentication will be performed without specifying authentication options 
+
+/* Static сredentials
+        authOptions: {
+          authType: AuthTypes.Static,
+          user: "username",
+          password: "password"
         },
+*/
+
+/* Сredentials from environment vars 
+        authOptions: {
+          authType: AuthTypes.Environment,
+        },
+*/
+
+/* Сredentials from JSON file 
+        authOptions: {
+          authType: AuthTypes.Json,
+          jsonFileName: "full path filename"
+        },
+*/
+
         endpointUrl: "grpc://localhost:2136",
         databaseName: "local",
         tokenExpirationTimeout: 20000,
         connectionTimeout: 10000,
-});
+})
 
 const bot = new Telegraf(token, opts);
 bot.use(session({ store }));
