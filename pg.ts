@@ -19,6 +19,8 @@ interface NewPoolOpts {
 	config?: Omit<PoolConfig, "host" | "port" | "database" | "user" | "password">;
 	/** Table name to use for sessions. Defaults to "telegraf-sessions". */
 	table?: string;
+	/** Schema name to use for sessions. Defaults to "public". */
+	schema?: string;
 	/** Called on fatal connection or setup errors */
 	onInitError?: (err: unknown) => void;
 }
@@ -28,6 +30,8 @@ interface ExistingPoolOpts {
 	pool: Pool;
 	/** Table name to use for sessions. Defaults to "telegraf-sessions". */
 	table?: string;
+	/** Schema name to use for sessions. Defaults to "public". */
+	schema?: string;
 	/** Called on fatal connection or setup errors */
 	onInitError?: (err: unknown) => void;
 }
@@ -53,6 +57,7 @@ export function Postgres<Session>(opts: NewPoolOpts | ExistingPoolOpts) {
 						}),
 				  },
 		table: opts.table,
+		schema: opts.schema,
 		onInitError: opts.onInitError,
 	});
 }

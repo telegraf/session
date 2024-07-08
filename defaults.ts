@@ -1,1 +1,1 @@
-export const defaults = { table: "telegraf-sessions" };
+export const defaults = { table: "telegraf-sessions", schema: "public" };

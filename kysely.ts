@@ -23,6 +23,8 @@ interface NewClientOpts {
 	config: KyselyConfig;
 	/** Table name to use for sessions. Defaults to "telegraf-sessions". */
 	table?: string;
+	/** Schema name to use for sessions. Defaults to "public". */
+	schema?: string;
 	/** Called on fatal connection or setup errors */
 	onInitError?: (err: unknown) => void;
 }
@@ -31,10 +33,12 @@ interface NewClientOpts {
 export const KyselyStore = <Session>(opts: NewClientOpts): SessionStore<Session> => {
 	// this assertion is a hack to make the Database type work
 	const table = (opts.table ?? defaults.table) as "telegraf-sessions";
+	const schema = (opts.schema ?? defaults.schema) as "public";
 
 	const client: Kysely<Database> = new Kysely(opts.config);
 
 	const create = client.schema
+		.withSchema(schema)
 		.createTable(table)
 		.ifNotExists()
 		.addColumn("key", "varchar(32)", col => col.primaryKey().notNull())
@@ -50,6 +54,7 @@ export const KyselyStore = <Session>(opts: NewClientOpts): SessionStore<Session>
 			const value = (
 				await client
 					//
+					.withSchema(schema)
 					.selectFrom(table)
 					.select("session")
 					.where("key", "=", key)
@@ -66,11 +71,13 @@ export const KyselyStore = <Session>(opts: NewClientOpts): SessionStore<Session>
 
 			const res = await (opts.config.dialect instanceof MysqlDialect
 				? client
+						.withSchema(schema)
 						.insertInto(table)
 						.values({ key, session })
 						// MySQL has ON DUPLICATE KEY UPDATE
 						.onDuplicateKeyUpdate({ session })
 				: client
+						.withSchema(schema)
 						.insertInto(table)
 						.values({ key, session })
 						// Postgres and SQLITE have ON CONFLICT DO UPDATE SET
@@ -81,6 +88,7 @@ export const KyselyStore = <Session>(opts: NewClientOpts): SessionStore<Session>
 			await create;
 
 			await client //
+				.withSchema(schema)
 				.deleteFrom(table)
 				.where("key", "=", key)
 				.executeTakeFirst();
